@@ -21,6 +21,8 @@ const encrypt = require('mongoose-encryption')
 
 main().catch(err => console.log(err));
 
+console.log(process.env.UJJWAL);
+
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/Login');
   console.log("Database Connected");
@@ -39,7 +41,8 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-const secret = "This is a Little Secret";
+// const secret = "This is a Little Secret"; this has been shifted to .env file
+
 
 userSchema.plugin(encrypt , {secret : secret , encryptedFields : ['password']});
 
