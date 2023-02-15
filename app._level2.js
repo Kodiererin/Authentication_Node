@@ -43,9 +43,8 @@ const userSchema = new mongoose.Schema({
 
 // const secret = "This is a Little Secret"; this has been shifted to .env file
 
-
-userSchema.plugin(encrypt , {secret : secret , encryptedFields : ['password']});
-
+userSchema.plugin(encrypt , {secret : process.env.SECRET , encryptedFields : ['password']});
+// We have to hide .env file when we are uploading it to the GITHUB
 
 const user = new mongoose.model('user',userSchema);
 
