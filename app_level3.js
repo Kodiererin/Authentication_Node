@@ -16,8 +16,10 @@ app.use(bodyParser.urlencoded({
 }));
 const mongoose = require('mongoose');
 
-// Getting mongoose encryption
-const encrypt = require('mongoose-encryption')
+// Acquiring MD5 for Hashing Encryption
+const md5 = require('md5');
+
+
 
 main().catch(err => console.log(err));
 
@@ -43,9 +45,6 @@ const userSchema = new mongoose.Schema({
 
 // const secret = "This is a Little Secret"; this has been shifted to .env file
 
-userSchema.plugin(encrypt , {secret : process.env.SECRET , encryptedFields : ['password']});
-// We have to hide .env file when we are uploading it to the GITHUB
-
 const user = new mongoose.model('user',userSchema);
 
 
@@ -64,7 +63,7 @@ app.get('/register',function(req,res){
 app.post('/register',function(req,res){
     const newUser = new user({
         email : req.body.username,
-        password : req.body.password,
+        password : md5(req.body.password),           // changes has been done here
     });
 
     console.log(newUser);
@@ -81,7 +80,7 @@ app.post('/register',function(req,res){
 
 app.post('/login',function(req,res){
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password);
     console.log(username+"    "+password);
     user.findOne(
         {email : username},
@@ -108,3 +107,5 @@ app.post('/login',function(req,res){
 app.listen(3000,function(){
     console.log("Server Connected to Port 3000");
 })
+
+
