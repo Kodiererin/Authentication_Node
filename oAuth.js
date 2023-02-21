@@ -53,6 +53,9 @@ const userSchema = new mongoose.Schema({
     },
     password : {
         type : String,
+    },
+    googleId : {
+        type : String,
     }
 });
 
@@ -96,7 +99,7 @@ passport.serializeUser(function(user, done) {
 
   
   function(accessToken, refreshToken, profile, cb) {
-    console.log(accessToken);
+    console.log(profile);
     // findorcreate is a dummy code which is telling to write your own code but we'll be installing npm mongoose findorcreate package by by installling it
     // tha package name is npm i mongoose-findorcreate
     user.findOrCreate({ googleId: profile.id }, function (err, user) {
