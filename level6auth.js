@@ -77,6 +77,17 @@ app.get('/register',function(req,res){
     res.render('register');
 })
 
+app.get('/secrets' , function(req,res){
+    // checking if the user is logged in or not (by cookies)
+    if(req.isAuthenticated()){
+        res.render('secrets');
+    }
+
+    else{
+        res.redirect("/login");
+    }
+})
+
 app.post('/register',function(req,res){
     // using passport local package to use it.
     user.register({username : req.body.username}, req.body.password , function(err,user){
@@ -84,7 +95,12 @@ app.post('/register',function(req,res){
             console.log(err);
             res.redirect('/register');
         }else{
-            
+            // we are using the type of authentication called local
+            // authrntication will be successful if we manages to set up the cookie that saved their logged in sesstion
+            // and we have to check if they are logged in or not 
+            passport.authenticate("local")(req,res , function(){
+                res.redirect('/secrets');
+            })
         }
     });
 
@@ -92,7 +108,22 @@ app.post('/register',function(req,res){
 
 
 app.post('/login',function(req,res){
-    
+    const newUser = new user({
+        email : req.body.username,
+        password : req.body.pasword
+    })
+
+    // using login function of passport
+    req.logIn(newUser , function(err){
+        if(err){
+            console.log(err);
+        }else{
+            passport.authenticate("local")(req,res,function(){
+                res.redirect('/secrets');
+            })
+        }
+    })
+
 })
 
 
