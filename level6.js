@@ -7,7 +7,6 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
-
 const app = express();
 
 
@@ -60,9 +59,23 @@ const user = new mongoose.model('user',userSchema);
 passport.use(user.createStrategy());
 
 
-passport.serializeUser(user.serializeUser());
-passport.deserializeUser(user.deserializeUser());
+// passport.serializeUser(user.serializeUser());
+// passport.deserializeUser(user.deserializeUser());
 
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+    console.log('====================================');
+    console.log(user);
+    console.log('====================================');
+  });
+  
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+    console.log('====================================');
+    console.log(user);
+    console.log('====================================');
+  });
 
 
 app.get('/',function(req,res){
@@ -106,6 +119,18 @@ app.post('/register',function(req,res){
 
 })
 
+// const LocalStrategy = require('passport-local').Strategy;
+
+// passport.use(new LocalStrategy(
+//     function(username, password, done) {
+//       User.findOne({ username: username }, function (err, user) {
+//         if (err) { return done(err); }
+//         if (!user) { return done(null, false); }
+//         if (!user.verifyPassword(password)) { return done(null, false); }
+//         return done(null, user);
+//       });
+//     }
+//   ));
 
 app.post('/login',function(req,res){
     const newUser = new user({
@@ -126,8 +151,16 @@ app.post('/login',function(req,res){
 
 })
 app.get('/logout',function(req,res){
-    req.logout();
-    res.redirect("/");
+    req.logout(function(err,accept){
+        if(!err){
+            res.redirect("/");
+        }else{
+            console.log('====================================');
+            console.log("Error");
+            console.log('====================================');
+        }
+    });
+    
 })
 
 
