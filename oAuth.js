@@ -1,4 +1,6 @@
-// This is Level 5 Encryotion.
+    // Remove HTTPS while loading at signin
+
+// This is Level 6 Encryotion.
 //////////// Using Passport JS //////////////////////////////////////////////////
 require('dotenv').config()
 const express = require('express');
@@ -13,6 +15,7 @@ const app = express();
 // implementing Google Strategy.
 var GoogleStrategy = require('passport-google-oauth20').Strategy; 
 var findOrCreate = require('mongoose-findorcreate');
+const e = require('express');
 
 
 
@@ -55,6 +58,9 @@ const userSchema = new mongoose.Schema({
         type : String,
     },
     googleId : {
+        type : String,
+    },
+    secret : {
         type : String,
     }
 });
@@ -136,13 +142,21 @@ app.get('/register',function(req,res){
 
 app.get('/secrets' , function(req,res){
     // checking if the user is logged in or not (by cookies)
-    if(req.isAuthenticated()){
-        res.render('secrets');
-    }
+    // if(req.isAuthenticated()){
+    //     res.render('secrets');
+    // }
 
-    else{
-        res.redirect("/login");
-    }
+    // else{
+    //     res.redirect("/login");
+    // }
+
+    user.find({"secret" : {$ne:null}} , function(err , data){
+        if(err){console.log(err);}
+        else{
+            res.render("secrets" , {usersWithSecrets : data})
+        }
+    })
+// ne:null -> not equals to null 
 })
 
 app.post('/register',function(req,res){
@@ -207,9 +221,30 @@ app.get('/logout',function(req,res){
     
 })
 
+app.get('/submit',function(req,res){
+    if(req.isAuthenticated){
+        res.render('submit')
+    }
+    else{
+        res.render('login');
+    }
+})
 
-
-
+app.post('/submit',function(req,res){
+    console.log(req.body);
+    const submittedsecret = req.body.secret;
+    user.findById(req.user._id , function(err, userFound){
+        if(!err && userFound){
+            console.log(userFound);
+            userFound.secret = submittedsecret;
+            userFound.save();
+            res.redirect('/secrets');
+        }
+        else{
+            console.log('Error Loading');
+        }
+    })
+})
 
 
 app.listen(3000,function(){
